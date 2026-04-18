@@ -16,10 +16,10 @@ export interface Video {
 export const VIDEOS: Video[] = [
   {
     id: "v1",
-    title: "Cinematic Drone Tour of the Swiss Alps | 4K Ultra HD",
-    description: "Experience the breathtaking beauty of the Swiss Alps from above. This cinematic journey takes you through snow-capped peaks, crystal clear lakes, and lush valleys. Perfect for relaxation and wanderlust seekers looking for the ultimate high-quality nature footage.",
-    thumbnailUrl: "https://picsum.photos/seed/alps/1280/720",
-    videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    title: "FUCKQUEEN FINALLY MET EMRIS53 ",
+    description: ".",
+    thumbnailUrl: "https://thumb-cdn77.xvideos-cdn.com/baccb51b-d0e1-4c9f-9757-fd55ac29eb1b/0/xv_9_p.jpg",
+    videoUrl: "https://mp4-cdn77.xvideos-cdn.com/baccb51b-d0e1-4c9f-9757-fd55ac29eb1b/0/video_240p.mp4?secure=JiJ__eFbBI3m5W-2dX_nqw==,1776525414",
     category: "Travel",
     tags: ["nature", "drone", "4k", "mountains", "alps", "cinematic"],
     views: 1250430,
