@@ -4,29 +4,44 @@ BangVault is a high-performance, SEO-optimized video streaming platform designed
 
 ## Project Structure
 
-- `src/data/videos.ts`: **The Source of Truth.** This file contains all the video data.
+- `src/types/video.ts`: Defines the `Video` data structure.
+- `src/data/categories.ts`: List of available video categories.
+- `src/data/contents/`: Directory where each video has its own file.
+- `src/data/videos.ts`: Aggregator that exports all videos and categories.
 - `src/components/`: Reusable UI components (Player, AdSlots, Cards, etc.).
 - `src/App.tsx`: Main logic handling search, categories, and page views.
-- `src/index.css`: Global theme, fonts, and Tailwind configurations.
 
 ## 1. How to add more videos
-To expand the library, open `src/data/videos.ts` and add a new object to the `VIDEOS` array:
+To keep the project clean, videos are organized in separate files:
 
+1. Create a new file in `src/data/contents/` (e.g., `v5.ts`).
+2. Paste the following template and fill in the details:
 ```typescript
-{
+import { Video } from "../../types/video";
+
+export const video: Video = {
   id: "v5",
   title: "Your Clickbait SEO Title Here",
   description: "Highly optimized description for search engines...",
   thumbnailUrl: "https://your-image-url.com/thumb.jpg",
   videoUrl: "https://your-video-url.com/video.mp4",
-  category: "Tech", // Must match one of the categories
+  category: "Tech",
   tags: ["keyword1", "keyword2"],
   views: 100000,
   duration: "10:00",
   uploadDate: "2024-04-18",
-  isTrending: true, // Shows in the trending row
-  isFeatured: false // Shows in the hero banner if true
-}
+  isTrending: true,
+  isFeatured: false
+};
+```
+3. Open `src/data/contents/index.ts`.
+4. Import your new video and add it to the `allVideos` array:
+```typescript
+import { video as v1 } from "./v1";
+// ...
+import { video as v5 } from "./v5";
+
+export const allVideos = [v1, v2, v3, v4, v5];
 ```
 
 ## 2. Managing Advertisements
