@@ -4,7 +4,7 @@ import { Upload, Facebook, Twitter, Instagram, Youtube, Mail, ExternalLink } fro
 export const Footer: React.FC = () => {
   return (
     <footer className="bg-zinc-950 border-t border-zinc-900 pt-20 pb-10 px-6 sm:px-12">
-      <div className="max-w-[1800px] mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-24 mb-20">
+      <div className="max-w-[1800px] mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 lg:gap-24 mb-20">
         
         {/* Brand */}
         <div className="space-y-6">
@@ -33,21 +33,6 @@ export const Footer: React.FC = () => {
               <Youtube size={18} />
             </button>
           </div>
-        </div>
-
-        {/* Explore */}
-        <div className="space-y-6">
-          <h3 className="text-sm font-bold uppercase tracking-widest text-zinc-300">Explore Categories</h3>
-          <ul className="grid grid-cols-2 gap-3 text-sm text-zinc-500">
-            <li className="hover:text-white cursor-pointer transition-colors">Digital Art</li>
-            <li className="hover:text-white cursor-pointer transition-colors">Interior Design</li>
-            <li className="hover:text-white cursor-pointer transition-colors">Urban Travel</li>
-            <li className="hover:text-white cursor-pointer transition-colors">Future Tech</li>
-            <li className="hover:text-white cursor-pointer transition-colors">Street Food</li>
-            <li className="hover:text-white cursor-pointer transition-colors">Gaming Laps</li>
-            <li className="hover:text-white cursor-pointer transition-colors">Life Hacks</li>
-            <li className="hover:text-white cursor-pointer transition-colors">Cinema</li>
-          </ul>
         </div>
 
         {/* Company */}

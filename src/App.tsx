@@ -39,11 +39,11 @@ export default function App() {
   };
 
   const currentVideo = useMemo(() => 
-    VIDEOS.find(v => v.id === selectedVideoId) || VIDEOS[0], 
+    VIDEOS.find(v => v.id === selectedVideoId) || VIDEOS[0] || null, 
   [selectedVideoId]);
 
   const featuredVideo = useMemo(() => 
-    VIDEOS.find(v => v.isFeatured) || VIDEOS[0], 
+    VIDEOS.find(v => v.isFeatured) || VIDEOS[0] || null, 
   []);
 
   const filteredVideos = useMemo(() => {
@@ -120,26 +120,30 @@ export default function App() {
                   exit={{ opacity: 0 }}
                   className="space-y-12 sm:space-y-20 pb-20"
                 >
-                  <Hero video={featuredVideo} onWatch={handleWatch} />
+                  {featuredVideo && <Hero video={featuredVideo} onWatch={handleWatch} />}
                   
                   {/* Category Filter Row */}
-                  <div className="px-6 sm:px-12 flex items-center gap-3 overflow-x-auto no-scrollbar py-2">
-                    {CATEGORIES.map(cat => (
-                      <button 
-                        key={cat}
-                        onClick={() => setSelectedCategory(cat)}
-                        className={`px-5 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all whitespace-nowrap border ${selectedCategory === cat ? 'bg-brand-primary border-brand-primary text-white' : 'bg-transparent border-zinc-800 text-zinc-400 hover:border-zinc-700 hover:text-white'}`}
-                      >
-                        {cat}
-                      </button>
-                    ))}
-                  </div>
+                  {CATEGORIES.length > 0 && (
+                    <div className="px-6 sm:px-12 flex items-center gap-3 overflow-x-auto no-scrollbar py-2">
+                      {CATEGORIES.map(cat => (
+                        <button 
+                          key={cat}
+                          onClick={() => setSelectedCategory(cat)}
+                          className={`px-5 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all whitespace-nowrap border ${selectedCategory === cat ? 'bg-brand-primary border-brand-primary text-white' : 'bg-transparent border-zinc-800 text-zinc-400 hover:border-zinc-700 hover:text-white'}`}
+                        >
+                          {cat}
+                        </button>
+                      ))}
+                    </div>
+                  )}
 
                   {/* Trending Section */}
-                  <TrendingRow 
-                    videos={VIDEOS.filter(v => v.isTrending)} 
-                    onVideoClick={handleWatch} 
-                  />
+                  {VIDEOS.some(v => v.isTrending) && (
+                    <TrendingRow 
+                      videos={VIDEOS.filter(v => v.isTrending)} 
+                      onVideoClick={handleWatch} 
+                    />
+                  )}
 
                   {/* Ads Banner */}
                   <div className="px-6 sm:px-12">
@@ -185,7 +189,7 @@ export default function App() {
                 </motion.div>
               )}
 
-              {currentPage === "watch" && (
+              {currentPage === "watch" && currentVideo && (
                 <motion.div 
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -199,7 +203,7 @@ export default function App() {
                     <div className="space-y-6">
                       <div className="flex flex-col gap-4">
                         <div className="flex flex-wrap items-center gap-2">
-                          {currentVideo.tags.map(tag => (
+                          {currentVideo.tags && currentVideo.tags.map(tag => (
                             <span key={tag} className="text-brand-primary text-xs font-bold uppercase tracking-wider hover:underline cursor-pointer">#{tag}</span>
                           ))}
                         </div>
@@ -367,24 +371,26 @@ export default function App() {
       <Footer />
 
       {/* Structured Data for SEO */}
-      <script type="application/ld+json">
-        {JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "VideoObject",
-          "name": currentVideo.title,
-          "description": currentVideo.description,
-          "thumbnailUrl": currentVideo.thumbnailUrl,
-          "uploadDate": currentVideo.uploadDate,
-          "duration": "PT12M45S",
-          "contentUrl": currentVideo.videoUrl,
-          "embedUrl": currentVideo.videoUrl,
-          "interactionStatistic": {
-            "@type": "InteractionCounter",
-            "interactionType": "https://schema.org/WatchAction",
-            "userInteractionCount": currentVideo.views
-          }
-        })}
-      </script>
+      {currentVideo && (
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "VideoObject",
+            "name": currentVideo.title,
+            "description": currentVideo.description,
+            "thumbnailUrl": currentVideo.thumbnailUrl,
+            "uploadDate": currentVideo.uploadDate,
+            "duration": "PT12M45S",
+            "contentUrl": currentVideo.videoUrl,
+            "embedUrl": currentVideo.videoUrl,
+            "interactionStatistic": {
+              "@type": "InteractionCounter",
+              "interactionType": "https://schema.org/WatchAction",
+              "userInteractionCount": currentVideo.views
+            }
+          })}
+        </script>
+      )}
     </div>
   );
 }
