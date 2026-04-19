@@ -33,7 +33,7 @@ export const VIDEOS: Video[] = [
     title: "The Ultimate Street Food Guide | Japan's Hidden Gems",
     description: "Join us as we explore the bustling streets of Tokyo and Osaka to find the best hidden street food gems. From savory takoyaki to melt-in-your-mouth wagyu skewers, this guide is a must-watch for foodies and travel enthusiasts. Discover why Japanese street food is world-renowned.",
     thumbnailUrl: "https://picsum.photos/seed/food/1280/720",
-    videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+    videoUrl: "https://cdn.videy.co/7nOhUAiq1.mp4",
     category: "Lifestyle",
     tags: ["food", "japan", "tokyo", "street food", "travel", "vlog"],
     views: 890210,
