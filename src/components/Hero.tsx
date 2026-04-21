@@ -12,7 +12,7 @@ export const Hero: React.FC<HeroProps> = ({ video, onWatch }) => {
   return (
     <section className="relative w-full h-[60vh] sm:h-[75vh] md:h-[85vh] overflow-hidden group">
       {/* Background Image with Gradient Overlay */}
-      <div className="absolute inset-0">
+      <div className="absolute inset-0 pointer-events-none">
         <motion.img 
           src={video.thumbnailUrl} 
           alt={video.title}
@@ -70,7 +70,7 @@ export const Hero: React.FC<HeroProps> = ({ video, onWatch }) => {
       </div>
 
       {/* Bottom transition gradient */}
-      <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-black to-transparent" />
+      <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-black to-transparent pointer-events-none" />
     </section>
   );
 };
