@@ -95,6 +95,9 @@ export default function App() {
       <Header 
         onSearch={handleSearch} 
         onLogoClick={() => setCurrentPage("home")} 
+        categories={CATEGORIES}
+        selectedCategory={selectedCategory}
+        onCategorySelect={handleCategoryClick}
       />
 
       {/* Main Content Area */}
