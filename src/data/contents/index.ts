@@ -1,5 +1,3 @@
-import { video as v1 } from "./v1";
-import { video as v2 } from "./v2";
 import { video as v3 } from "./v3";
 
-export const allVideos = [v1, v2, v3];
+export const allVideos = [v3];
