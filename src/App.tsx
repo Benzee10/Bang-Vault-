@@ -86,6 +86,41 @@ export default function App() {
     return () => window.removeEventListener("hashchange", apply);
   }, []);
 
+  // Update document title + Open Graph / Twitter meta tags so shared links
+  // show the right poster, title and description for the current video.
+  useEffect(() => {
+    const setMeta = (selector: string, value: string) => {
+      const el = document.head.querySelector(selector) as HTMLMetaElement | null;
+      if (el) el.setAttribute("content", value);
+    };
+
+    const onWatch = currentPage === "watch" && selectedVideoId;
+    const v = onWatch ? VIDEOS.find((x) => x.id === selectedVideoId) : null;
+
+    if (v) {
+      const url = `${window.location.origin}${window.location.pathname}#/watch/${slugify(v.title)}`;
+      document.title = `${v.title} | BangVault`;
+      setMeta('meta[name="description"]', v.description);
+      setMeta('meta[property="og:title"]', v.title);
+      setMeta('meta[property="og:description"]', v.description);
+      setMeta('meta[property="og:image"]', v.thumbnailUrl);
+      setMeta('meta[property="og:url"]', url);
+      setMeta('meta[property="og:type"]', "video.other");
+      setMeta('meta[name="twitter:title"]', v.title);
+      setMeta('meta[name="twitter:description"]', v.description);
+      setMeta('meta[name="twitter:image"]', v.thumbnailUrl);
+    } else {
+      document.title = "BangVault";
+      setMeta('meta[name="description"]', "Premium video streaming.");
+      setMeta('meta[property="og:title"]', "BangVault");
+      setMeta('meta[property="og:description"]', "Premium video streaming.");
+      setMeta('meta[property="og:image"]', "");
+      setMeta('meta[name="twitter:title"]', "BangVault");
+      setMeta('meta[name="twitter:description"]', "Premium video streaming.");
+      setMeta('meta[name="twitter:image"]', "");
+    }
+  }, [currentPage, selectedVideoId]);
+
   // Sync state -> hash (without triggering hashchange loop)
   useEffect(() => {
     const desired = buildHash({
