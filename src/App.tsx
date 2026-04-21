@@ -6,7 +6,7 @@ import {
   Filter, Grid3X3, Loader2, Check
 } from "lucide-react";
 
-import { VIDEOS, CATEGORIES, Video } from "./data/videos";
+import { VIDEOS, CATEGORIES, Video, slugify, findVideoBySlug } from "./data/videos";
 import { Header } from "./components/Header";
 import { Hero } from "./components/Hero";
 import { VideoCard } from "./components/VideoCard";
@@ -25,7 +25,11 @@ interface RouteState {
 }
 
 const buildHash = (s: RouteState): string => {
-  if (s.page === "watch" && s.videoId) return `#/watch/${encodeURIComponent(s.videoId)}`;
+  if (s.page === "watch" && s.videoId) {
+    const v = VIDEOS.find((x) => x.id === s.videoId);
+    const slug = v ? slugify(v.title) : s.videoId;
+    return `#/watch/${slug}`;
+  }
   if (s.page === "search") return `#/search?q=${encodeURIComponent(s.query)}`;
   if (s.page === "category" || (s.page === "home" && s.category !== "All")) {
     return `#/category/${encodeURIComponent(s.category)}`;
@@ -37,7 +41,9 @@ const parseHash = (hash: string): Partial<RouteState> => {
   const h = hash.replace(/^#\/?/, "");
   if (!h) return { page: "home", videoId: null, category: "All", query: "" };
   if (h.startsWith("watch/")) {
-    return { page: "watch", videoId: decodeURIComponent(h.slice("watch/".length)) };
+    const slug = decodeURIComponent(h.slice("watch/".length));
+    const v = findVideoBySlug(slug) || VIDEOS.find((x) => x.id === slug);
+    return { page: "watch", videoId: v ? v.id : slug };
   }
   if (h.startsWith("category/")) {
     return { page: "home", category: decodeURIComponent(h.slice("category/".length)), videoId: null, query: "" };
@@ -166,7 +172,7 @@ export default function App() {
 
   const handleShare = useCallback(async () => {
     if (!currentVideo) return;
-    const url = `${window.location.origin}${window.location.pathname}#/watch/${encodeURIComponent(currentVideo.id)}`;
+    const url = `${window.location.origin}${window.location.pathname}#/watch/${slugify(currentVideo.title)}`;
     try {
       if (navigator.share) {
         await navigator.share({ title: currentVideo.title, url });
