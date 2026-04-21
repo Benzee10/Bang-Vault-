@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { 
-  Menu, X, Search, Zap, Play, Clock, Eye, 
+  Search, 
   Share2, MessageSquare, ThumbsUp, ThumbsDown, 
-  ChevronRight, Filter, TrendingUp, Grid3X3, Loader2 
+  Filter, Grid3X3, Loader2, Check
 } from "lucide-react";
 
 import { VIDEOS, CATEGORIES, Video } from "./data/videos";
@@ -17,6 +17,39 @@ import { Footer } from "./components/Footer";
 
 type Page = "home" | "watch" | "category" | "search";
 
+interface RouteState {
+  page: Page;
+  videoId: string | null;
+  category: string;
+  query: string;
+}
+
+const buildHash = (s: RouteState): string => {
+  if (s.page === "watch" && s.videoId) return `#/watch/${encodeURIComponent(s.videoId)}`;
+  if (s.page === "search") return `#/search?q=${encodeURIComponent(s.query)}`;
+  if (s.page === "category" || (s.page === "home" && s.category !== "All")) {
+    return `#/category/${encodeURIComponent(s.category)}`;
+  }
+  return "#/";
+};
+
+const parseHash = (hash: string): Partial<RouteState> => {
+  const h = hash.replace(/^#\/?/, "");
+  if (!h) return { page: "home", videoId: null, category: "All", query: "" };
+  if (h.startsWith("watch/")) {
+    return { page: "watch", videoId: decodeURIComponent(h.slice("watch/".length)) };
+  }
+  if (h.startsWith("category/")) {
+    return { page: "home", category: decodeURIComponent(h.slice("category/".length)), videoId: null, query: "" };
+  }
+  if (h.startsWith("search")) {
+    const qIdx = h.indexOf("?q=");
+    const query = qIdx >= 0 ? decodeURIComponent(h.slice(qIdx + 3)) : "";
+    return { page: "search", query, videoId: null };
+  }
+  return { page: "home" };
+};
+
 export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>("home");
   const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
@@ -25,6 +58,7 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [visibleVideos, setVisibleVideos] = useState(12);
   const [history, setHistory] = useState<string[]>([]);
+  const [shareCopied, setShareCopied] = useState(false);
 
   // Load history from localStorage
   useEffect(() => {
@@ -32,10 +66,40 @@ export default function App() {
     if (saved) setHistory(JSON.parse(saved));
   }, []);
 
+  // Hash-based routing: parse on load + listen to changes
+  useEffect(() => {
+    const apply = () => {
+      const r = parseHash(window.location.hash);
+      if (r.page !== undefined) setCurrentPage(r.page);
+      if (r.videoId !== undefined) setSelectedVideoId(r.videoId);
+      if (r.category !== undefined) setSelectedCategory(r.category);
+      if (r.query !== undefined) setSearchQuery(r.query);
+    };
+    apply();
+    window.addEventListener("hashchange", apply);
+    return () => window.removeEventListener("hashchange", apply);
+  }, []);
+
+  // Sync state -> hash (without triggering hashchange loop)
+  useEffect(() => {
+    const desired = buildHash({
+      page: currentPage,
+      videoId: selectedVideoId,
+      category: selectedCategory,
+      query: searchQuery,
+    });
+    if (window.location.hash !== desired && !(desired === "#/" && window.location.hash === "")) {
+      history && history; // noop to satisfy lint
+      window.history.replaceState(null, "", desired);
+    }
+  }, [currentPage, selectedVideoId, selectedCategory, searchQuery]);
+
   const addToHistory = (id: string) => {
-    const newHistory = [id, ...history.filter(i => i !== id)].slice(0, 10);
-    setHistory(newHistory);
-    localStorage.setItem("bangvault_history", JSON.stringify(newHistory));
+    setHistory(prev => {
+      const newHistory = [id, ...prev.filter(i => i !== id)].slice(0, 10);
+      localStorage.setItem("bangvault_history", JSON.stringify(newHistory));
+      return newHistory;
+    });
   };
 
   const currentVideo = useMemo(() => 
@@ -57,7 +121,10 @@ export default function App() {
       );
     }
     if (selectedCategory !== "All") {
-      list = list.filter(v => v.category === selectedCategory);
+      list = list.filter(v =>
+        v.category === selectedCategory ||
+        v.tags.some(t => t.toLowerCase() === selectedCategory.toLowerCase())
+      );
     }
     return list;
   }, [searchQuery, selectedCategory]);
@@ -68,7 +135,6 @@ export default function App() {
     addToHistory(id);
     window.scrollTo({ top: 0, behavior: "smooth" });
     
-    // Simulate loading
     setTimeout(() => {
       setCurrentPage("watch");
       setLoading(false);
@@ -77,24 +143,58 @@ export default function App() {
 
   const handleCategoryClick = (cat: string) => {
     setSelectedCategory(cat);
+    setSearchQuery("");
     setCurrentPage("home");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
-    if (query && currentPage !== "watch") {
+    if (query) {
       setCurrentPage("search");
-    } else if (!query && currentPage === "search") {
+    } else if (currentPage === "search") {
       setCurrentPage("home");
     }
   };
+
+  const handleTagClick = (tag: string) => {
+    setSelectedCategory("All");
+    setSearchQuery(tag);
+    setCurrentPage("search");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleShare = useCallback(async () => {
+    if (!currentVideo) return;
+    const url = `${window.location.origin}${window.location.pathname}#/watch/${encodeURIComponent(currentVideo.id)}`;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: currentVideo.title, url });
+      } else {
+        await navigator.clipboard.writeText(url);
+      }
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 2000);
+    } catch {
+      try {
+        await navigator.clipboard.writeText(url);
+        setShareCopied(true);
+        setTimeout(() => setShareCopied(false), 2000);
+      } catch {
+        /* noop */
+      }
+    }
+  }, [currentVideo]);
 
   return (
     <div className="min-h-screen flex flex-col selection:bg-brand-primary selection:text-white">
       <Header 
         onSearch={handleSearch} 
-        onLogoClick={() => setCurrentPage("home")} 
+        onLogoClick={() => {
+          setSelectedCategory("All");
+          setSearchQuery("");
+          setCurrentPage("home");
+        }}
         categories={CATEGORIES}
         selectedCategory={selectedCategory}
         onCategorySelect={handleCategoryClick}
@@ -207,7 +307,14 @@ export default function App() {
                       <div className="flex flex-col gap-4">
                         <div className="flex flex-wrap items-center gap-2">
                           {currentVideo.tags && currentVideo.tags.map(tag => (
-                            <span key={tag} className="text-brand-primary text-xs font-bold uppercase tracking-wider hover:underline cursor-pointer">#{tag}</span>
+                            <button
+                              key={tag}
+                              type="button"
+                              onClick={() => handleTagClick(tag)}
+                              className="text-brand-primary text-xs font-bold uppercase tracking-wider hover:underline cursor-pointer"
+                            >
+                              #{tag}
+                            </button>
                           ))}
                         </div>
                         <h1 className="text-2xl sm:text-4xl font-display font-bold tracking-tight leading-tight">
@@ -237,9 +344,15 @@ export default function App() {
                               <ThumbsDown size={18} />
                             </button>
                           </div>
-                          <button className="flex items-center gap-2 px-5 py-2 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 rounded-full transition-all">
-                            <Share2 size={18} />
-                            <span className="text-xs font-bold hidden sm:block">Share</span>
+                          <button
+                            type="button"
+                            onClick={handleShare}
+                            className="flex items-center gap-2 px-5 py-2 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 rounded-full transition-all"
+                          >
+                            {shareCopied ? <Check size={18} className="text-brand-primary" /> : <Share2 size={18} />}
+                            <span className="text-xs font-bold hidden sm:block">
+                              {shareCopied ? "Link Copied" : "Share"}
+                            </span>
                           </button>
                         </div>
                       </div>
