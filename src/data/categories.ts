@@ -2,5 +2,7 @@ export const CATEGORIES = [
   "All",
   "Latina",
   "Lesbian",
-  "Webcam"
+  "Webcam",
+  "African",
+  "Pussy Licking"
 ];
