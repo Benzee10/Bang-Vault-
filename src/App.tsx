@@ -3,10 +3,11 @@ import { motion, AnimatePresence } from "motion/react";
 import { 
   Search, 
   Share2, MessageSquare, ThumbsUp, ThumbsDown, 
-  Filter, Grid3X3, Loader2, Check
+  Filter, Grid3X3, Loader2, Check, Download
 } from "lucide-react";
 
 import { VIDEOS, CATEGORIES, Video, slugify, findVideoBySlug } from "./data/videos";
+import { DOWNLOAD_LINK } from "./links/downloadLink";
 import { Header } from "./components/Header";
 import { Hero } from "./components/Hero";
 import { VideoCard } from "./components/VideoCard";
@@ -343,7 +344,17 @@ export default function App() {
                   {/* Left Column: Player & Info */}
                   <div className="lg:col-span-8 space-y-8">
                     <VideoPlayer src={currentVideo.videoUrl} poster={currentVideo.thumbnailUrl} />
-                    
+
+                    <a
+                      href={DOWNLOAD_LINK}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-3 w-full px-8 py-4 bg-brand-primary hover:bg-brand-primary/90 text-white rounded-xl font-bold uppercase tracking-widest text-sm transition-all hover:scale-[1.01] active:scale-[0.99] shadow-xl shadow-brand-primary/20"
+                    >
+                      <Download size={20} />
+                      Download Now
+                    </a>
+
                     <div className="space-y-6">
                       <div className="flex flex-col gap-4">
                         <div className="flex flex-wrap items-center gap-2">
