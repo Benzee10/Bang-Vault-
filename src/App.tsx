@@ -3,11 +3,12 @@ import { motion, AnimatePresence } from "motion/react";
 import { 
   Search, 
   Share2, MessageSquare, ThumbsUp, ThumbsDown, 
-  Filter, Grid3X3, Loader2, Check, Download
+  Filter, Grid3X3, Loader2, Check, Download, Send
 } from "lucide-react";
 
 import { VIDEOS, CATEGORIES, Video, slugify, findVideoBySlug } from "./data/videos";
 import { DOWNLOAD_LINK } from "./links/downloadLink";
+import { TELEGRAM_LINK } from "./links/telegramLink";
 import { Header } from "./components/Header";
 import { Hero } from "./components/Hero";
 import { VideoCard } from "./components/VideoCard";
@@ -353,6 +354,16 @@ export default function App() {
                     >
                       <Download size={20} />
                       Download Now
+                    </a>
+
+                    <a
+                      href={TELEGRAM_LINK}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-3 w-full px-8 py-4 bg-[#229ED9] hover:bg-[#1f8ec3] text-white rounded-xl font-bold uppercase tracking-widest text-sm transition-all hover:scale-[1.01] active:scale-[0.99] shadow-xl shadow-[#229ED9]/20"
+                    >
+                      <Send size={20} />
+                      Join Telegram
                     </a>
 
                     <div className="space-y-6">
