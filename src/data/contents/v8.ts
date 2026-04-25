@@ -2,7 +2,7 @@ import { Video } from "../../types/video";
 
 export const video: Video = {
   id: "v8",
-  title: "AFRICAN FOURSOME VIDEO",
+  title: "africa dancing fuck bar",
   description: "AFRICAN FOURSOME VIDEO.",
   thumbnailUrl: "https://img.lulucdn.com/dz048273ionw_t.jpg",
   videoUrl: "https://luluvdo.com/e/dz048273ionw",
