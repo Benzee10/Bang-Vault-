@@ -14,6 +14,7 @@ import { Hero } from "./components/Hero";
 import { VideoCard } from "./components/VideoCard";
 import { TrendingRow } from "./components/TrendingRow";
 import { AdSlot } from "./components/AdSlot";
+import { AdsterraBanner } from "./components/AdsterraBanner";
 import { VideoPlayer } from "./components/VideoPlayer";
 import { Footer } from "./components/Footer";
 
@@ -293,7 +294,7 @@ export default function App() {
 
                   {/* Ads Banner */}
                   <div className="px-6 sm:px-12">
-                    <AdSlot type="banner" />
+                    <AdsterraBanner />
                   </div>
 
                   {/* Video Grid */}
@@ -365,6 +366,8 @@ export default function App() {
                       <Send size={20} />
                       Join Telegram
                     </a>
+
+                    <AdsterraBanner />
 
                     <div className="space-y-6">
                       <div className="flex flex-col gap-4">
