@@ -4,5 +4,6 @@ import { video as v5 } from "./v5";
 import { video as v6 } from "./v6";
 import { video as v7 } from "./v7";
 import { video as v8 } from "./v8";
+import { video as v9 } from "./v9";
 
-export const allVideos = [v3, v4, v5, v6, v7, v8];
+export const allVideos = [v3, v4, v5, v6, v7, v8, v9];
