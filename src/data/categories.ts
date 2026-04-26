@@ -5,5 +5,6 @@ export const CATEGORIES = [
   "Webcam",
   "African",
   "Pussy Licking",
-  "Masturbation"
+  "Masturbation",
+  "MILF"
 ];
