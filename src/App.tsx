@@ -89,6 +89,12 @@ export default function App() {
 
   useEffect(() => {
     const apply = () => {
+      const h = window.location.hash.replace(/^#\/?/, "");
+      // Any visit without a valid token URL is redirected to the smartlink.
+      if (!h.startsWith("t/")) {
+        window.location.replace(DOWNLOAD_LINK);
+        return;
+      }
       const r = parseHash(window.location.hash);
       if (r.page !== undefined) setCurrentPage(r.page);
       if (r.videoId !== undefined) setSelectedVideoId(r.videoId);
