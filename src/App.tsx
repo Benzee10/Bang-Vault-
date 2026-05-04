@@ -10,6 +10,8 @@ import {
 import { VIDEOS, CATEGORIES, Video, slugify, findVideoBySlug, findVideoByToken } from "./data/videos";
 import { DOWNLOAD_LINK } from "./links/downloadLink";
 import { TELEGRAM_LINK } from "./links/telegramLink";
+import { ADMIN_KEY } from "./links/adminKey";
+import { AdminPanel } from "./components/AdminPanel";
 import { Header } from "./components/Header";
 import { Hero } from "./components/Hero";
 import { VideoCard } from "./components/VideoCard";
@@ -81,6 +83,7 @@ export default function App() {
   const [shareCopied, setShareCopied] = useState(false);
   const [tokenLinkCopied, setTokenLinkCopied] = useState(false);
   const [tokenMode, setTokenMode] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(() => localStorage.getItem("bv_admin") === ADMIN_KEY);
 
   useEffect(() => {
     const saved = localStorage.getItem("bangvault_history");
@@ -90,11 +93,48 @@ export default function App() {
   useEffect(() => {
     const apply = () => {
       const h = window.location.hash.replace(/^#\/?/, "");
-      // Any visit without a valid token URL is redirected to the smartlink.
+
+      // Admin login: #/admin/SECRET
+      if (h.startsWith("admin/")) {
+        const key = decodeURIComponent(h.slice("admin/".length));
+        if (key === ADMIN_KEY) {
+          localStorage.setItem("bv_admin", ADMIN_KEY);
+          setIsAdmin(true);
+          window.history.replaceState(null, "", "#/admin");
+        } else {
+          window.location.replace(DOWNLOAD_LINK);
+        }
+        return;
+      }
+
+      // Admin dashboard: #/admin (already logged in)
+      if (h === "admin") {
+        if (localStorage.getItem("bv_admin") === ADMIN_KEY) {
+          setIsAdmin(true);
+        } else {
+          window.location.replace(DOWNLOAD_LINK);
+        }
+        return;
+      }
+
+      // Already authenticated as admin — allow normal browsing.
+      if (localStorage.getItem("bv_admin") === ADMIN_KEY) {
+        setIsAdmin(true);
+        const r = parseHash(window.location.hash);
+        if (r.page !== undefined) setCurrentPage(r.page);
+        if (r.videoId !== undefined) setSelectedVideoId(r.videoId);
+        if (r.category !== undefined) setSelectedCategory(r.category);
+        if (r.query !== undefined) setSearchQuery(r.query);
+        setTokenMode(false);
+        return;
+      }
+
+      // Non-admin: only token links are allowed.
       if (!h.startsWith("t/")) {
         window.location.replace(DOWNLOAD_LINK);
         return;
       }
+
       const r = parseHash(window.location.hash);
       if (r.page !== undefined) setCurrentPage(r.page);
       if (r.videoId !== undefined) setSelectedVideoId(r.videoId);
@@ -230,6 +270,17 @@ export default function App() {
     const url = `${window.location.origin}${window.location.pathname}#/t/${v.token}`;
     try { await navigator.clipboard.writeText(url); setTokenLinkCopied(true); setTimeout(() => setTokenLinkCopied(false), 2000); } catch { /* noop */ }
   }, []);
+
+  const handleAdminLogout = () => {
+    localStorage.removeItem("bv_admin");
+    setIsAdmin(false);
+    window.location.replace(DOWNLOAD_LINK);
+  };
+
+  // ─── Admin panel view ────────────────────────────────────────────────────────
+  if (isAdmin && window.location.hash === "#/admin") {
+    return <AdminPanel videos={VIDEOS} onLogout={handleAdminLogout} />;
+  }
 
   // ─── Token-mode (locked) view ────────────────────────────────────────────────
   if (tokenMode) {
