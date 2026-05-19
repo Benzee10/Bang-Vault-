@@ -6,5 +6,8 @@ export const CATEGORIES = [
   "African",
   "Pussy Licking",
   "Masturbation",
-  "MILF"
+  "MILF",
+  "Big Ass",
+  "Twerking",
+  "Strippers"
 ];

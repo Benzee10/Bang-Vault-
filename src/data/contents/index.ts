@@ -6,5 +6,6 @@ import { video as v7 } from "./v7";
 import { video as v8 } from "./v8";
 import { video as v9 } from "./v9";
 import { video as grandmaCrib } from "./grandma-crib";
+import { video as pretiiPaiidGiq } from "./pretii-paiid-giq";
 
-export const allVideos = [v3, v4, v5, v6, v7, v8, v9, grandmaCrib];
+export const allVideos = [v3, v4, v5, v6, v7, v8, v9, grandmaCrib, pretiiPaiidGiq];
