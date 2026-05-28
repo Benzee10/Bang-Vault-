@@ -8,5 +8,6 @@ import { video as v9 } from "./v9";
 import { video as grandmaCrib } from "./grandma-crib";
 import { video as pretiiPaiidGiq } from "./pretii-paiid-giq";
 import { video as imagineYoureHere } from "./imagine-youre-here";
+import { video as musicianPussyPlay } from "./musician-pussy-play";
 
-export const allVideos = [imagineYoureHere, pretiiPaiidGiq, grandmaCrib, v9, v8, v7, v6, v5, v4, v3];
+export const allVideos = [musicianPussyPlay, imagineYoureHere, pretiiPaiidGiq, grandmaCrib, v9, v8, v7, v6, v5, v4, v3];
