@@ -9,4 +9,4 @@ import { video as grandmaCrib } from "./grandma-crib";
 import { video as pretiiPaiidGiq } from "./pretii-paiid-giq";
 import { video as imagineYoureHere } from "./imagine-youre-here";
 
-export const allVideos = [v3, v4, v5, v6, v7, v8, v9, grandmaCrib, pretiiPaiidGiq, imagineYoureHere];
+export const allVideos = [imagineYoureHere, pretiiPaiidGiq, grandmaCrib, v9, v8, v7, v6, v5, v4, v3];
