@@ -10,5 +10,6 @@ import { video as pretiiPaiidGiq } from "./pretii-paiid-giq";
 import { video as imagineYoureHere } from "./imagine-youre-here";
 import { video as musicianPussyPlay } from "./musician-pussy-play";
 import { video as sexyCaramelSlimmie } from "./sexy-caramel-slimmie-plays-rides";
+import { video as sexyPetiteChocolateSlimmie } from "./sexy-petite-chocolate-slimmie-squirts";
 
-export const allVideos = [sexyCaramelSlimmie, musicianPussyPlay, imagineYoureHere, pretiiPaiidGiq, grandmaCrib, v9, v8, v7, v6, v5, v4, v3];
+export const allVideos = [sexyPetiteChocolateSlimmie, sexyCaramelSlimmie, musicianPussyPlay, imagineYoureHere, pretiiPaiidGiq, grandmaCrib, v9, v8, v7, v6, v5, v4, v3];

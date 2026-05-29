@@ -9,5 +9,6 @@ export const CATEGORIES = [
   "MILF",
   "Big Ass",
   "Twerking",
-  "Strippers"
+  "Strippers",
+  "Squirting"
 ];
