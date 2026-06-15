@@ -12,5 +12,6 @@ import { video as musicianPussyPlay } from "./musician-pussy-play";
 import { video as sexyCaramelSlimmie } from "./sexy-caramel-slimmie-plays-rides";
 import { video as sexyPetiteChocolateSlimmie } from "./sexy-petite-chocolate-slimmie-squirts";
 import { video as backyardSex } from "./backyard-sex";
+import { video as sunnyDayOnABalcony } from "./sunny-day-on-a-balcony";
 
-export const allVideos = [backyardSex, sexyPetiteChocolateSlimmie, sexyCaramelSlimmie, musicianPussyPlay, imagineYoureHere, pretiiPaiidGiq, grandmaCrib, v9, v8, v7, v6, v5, v4, v3];
+export const allVideos = [sunnyDayOnABalcony, backyardSex, sexyPetiteChocolateSlimmie, sexyCaramelSlimmie, musicianPussyPlay, imagineYoureHere, pretiiPaiidGiq, grandmaCrib, v9, v8, v7, v6, v5, v4, v3];
