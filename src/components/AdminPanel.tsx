@@ -13,7 +13,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ videos, onLogout }) => {
 
   const base = `${window.location.origin}${window.location.pathname}`;
 
-  const tokenLink = (v: Video) => `${base}#/t/${v.token}`;
   const watchLink = (v: Video) => `${base}#/watch/${slugify(v.title)}`;
 
   const copy = async (text: string, id: string) => {
@@ -46,8 +45,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ videos, onLogout }) => {
 
       <div className="max-w-4xl mx-auto px-4 sm:px-8 py-10 space-y-6">
         <div className="space-y-1">
-          <h1 className="text-2xl font-bold tracking-tight">Video Share Links</h1>
-          <p className="text-zinc-500 text-sm">Copy a restricted link to share a single video. Users visiting without a token are redirected to your smartlink.</p>
+          <h1 className="text-2xl font-bold tracking-tight">Video Links</h1>
+          <p className="text-zinc-500 text-sm">Copy a public watch link for any video. Visitors can browse the full website normally.</p>
         </div>
 
         <div className="space-y-4">
@@ -67,27 +66,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ videos, onLogout }) => {
                     <p className="text-[11px] text-zinc-500 mt-1">{v.category} · {v.uploadDate}</p>
                   </div>
 
-                  {/* Token link (share with users) */}
-                  <div className="space-y-1">
-                    <p className="text-[10px] uppercase tracking-widest text-zinc-500 font-semibold flex items-center gap-1"><Lock size={9} /> Restricted Share Link</p>
-                    <div className="flex items-center gap-2">
-                      <code className="flex-1 text-[11px] bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-brand-primary truncate">
-                        {v.token ? tokenLink(v) : "No token assigned"}
-                      </code>
-                      {v.token && (
-                        <button
-                          type="button"
-                          onClick={() => copy(tokenLink(v), `token-${v.id}`)}
-                          className="shrink-0 flex items-center gap-1.5 px-3 py-2 bg-brand-primary hover:bg-brand-primary/80 rounded-lg text-[11px] font-bold uppercase tracking-wider text-white transition-colors"
-                        >
-                          {copiedId === `token-${v.id}` ? <Check size={12} /> : <Copy size={12} />}
-                          {copiedId === `token-${v.id}` ? "Copied" : "Copy"}
-                        </button>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Watch link (owner/normal browsing) */}
+                  {/* Public watch link */}
                   <div className="space-y-1">
                     <p className="text-[10px] uppercase tracking-widest text-zinc-500 font-semibold flex items-center gap-1"><ExternalLink size={9} /> Your Watch Link</p>
                     <div className="flex items-center gap-2">
@@ -112,9 +91,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ videos, onLogout }) => {
 
         <div className="mt-8 p-4 bg-zinc-900/60 border border-zinc-800 rounded-xl text-xs text-zinc-500 space-y-1">
           <p className="font-semibold text-zinc-400">Admin Notes</p>
-          <p>• <strong>Restricted Share Link</strong> — share this with users. Shows only that video, no browsing.</p>
-          <p>• <strong>Your Watch Link</strong> — for your own use. Works while you're logged in as admin.</p>
-          <p>• To change a video token, edit the <code className="text-zinc-400">token</code> field in its file under <code className="text-zinc-400">src/data/contents/</code>.</p>
+          <p>• <strong>Public Watch Link</strong> — opens the video page and keeps the rest of the website available.</p>
           <p>• To change your admin secret, edit <code className="text-zinc-400">src/links/adminKey.ts</code>.</p>
         </div>
       </div>

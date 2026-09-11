@@ -11,6 +11,4 @@ export interface Video {
   uploadDate: string;
   isTrending?: boolean;
   isFeatured?: boolean;
-  /** Unique token for the restricted share link (#/t/TOKEN). */
-  token?: string;
 }

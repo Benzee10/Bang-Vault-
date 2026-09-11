@@ -4,10 +4,9 @@ import {
   Search, 
   Share2, MessageSquare, ThumbsUp, ThumbsDown, 
   Filter, Grid3X3, Loader2, Check, Download, Send,
-  Lock, Upload, ShieldOff
 } from "lucide-react";
 
-import { VIDEOS, CATEGORIES, Video, slugify, findVideoBySlug, findVideoByToken } from "./data/videos";
+import { VIDEOS, CATEGORIES, slugify, findVideoBySlug } from "./data/videos";
 import { DOWNLOAD_LINK } from "./links/downloadLink";
 import { TELEGRAM_LINK } from "./links/telegramLink";
 import { ADMIN_KEY } from "./links/adminKey";
@@ -28,14 +27,9 @@ interface RouteState {
   videoId: string | null;
   category: string;
   query: string;
-  tokenMode: boolean;
 }
 
 const buildHash = (s: RouteState): string => {
-  if (s.tokenMode && s.videoId) {
-    const v = VIDEOS.find((x) => x.id === s.videoId);
-    if (v?.token) return `#/t/${v.token}`;
-  }
   if (s.page === "watch" && s.videoId) {
     const v = VIDEOS.find((x) => x.id === s.videoId);
     const slug = v ? slugify(v.title) : s.videoId;
@@ -48,28 +42,22 @@ const buildHash = (s: RouteState): string => {
 
 const parseHash = (hash: string): Partial<RouteState> => {
   const h = hash.replace(/^#\/?/, "");
-  if (!h) return { page: "home", videoId: null, category: "All", query: "", tokenMode: false };
+  if (!h) return { page: "home", videoId: null, category: "All", query: "" };
 
-  if (h.startsWith("t/")) {
-    const token = decodeURIComponent(h.slice(2));
-    const v = findVideoByToken(token);
-    if (v) return { page: "watch", videoId: v.id, tokenMode: true, category: "All", query: "" };
-    return { page: "watch", videoId: null, tokenMode: true, category: "All", query: "" };
-  }
   if (h.startsWith("watch/")) {
     const slug = decodeURIComponent(h.slice("watch/".length));
     const v = findVideoBySlug(slug) || VIDEOS.find((x) => x.id === slug);
-    return { page: "watch", videoId: v ? v.id : slug, tokenMode: false };
+    return { page: "watch", videoId: v ? v.id : slug };
   }
   if (h.startsWith("category/")) {
-    return { page: "home", category: decodeURIComponent(h.slice("category/".length)), videoId: null, query: "", tokenMode: false };
+    return { page: "home", category: decodeURIComponent(h.slice("category/".length)), videoId: null, query: "" };
   }
   if (h.startsWith("search")) {
     const qIdx = h.indexOf("?q=");
     const query = qIdx >= 0 ? decodeURIComponent(h.slice(qIdx + 3)) : "";
-    return { page: "search", query, videoId: null, tokenMode: false };
+    return { page: "search", query, videoId: null };
   }
-  return { page: "home", tokenMode: false };
+  return { page: "home" };
 };
 
 export default function App() {
@@ -81,8 +69,6 @@ export default function App() {
   const [visibleVideos, setVisibleVideos] = useState(12);
   const [history, setHistory] = useState<string[]>([]);
   const [shareCopied, setShareCopied] = useState(false);
-  const [tokenLinkCopied, setTokenLinkCopied] = useState(false);
-  const [tokenMode, setTokenMode] = useState(false);
   const [isAdmin, setIsAdmin] = useState(() => localStorage.getItem("bv_admin") === ADMIN_KEY);
 
   useEffect(() => {
@@ -101,37 +87,13 @@ export default function App() {
           localStorage.setItem("bv_admin", ADMIN_KEY);
           setIsAdmin(true);
           window.history.replaceState(null, "", "#/admin");
-        } else {
-          window.location.replace(DOWNLOAD_LINK);
         }
         return;
       }
 
       // Admin dashboard: #/admin (already logged in)
       if (h === "admin") {
-        if (localStorage.getItem("bv_admin") === ADMIN_KEY) {
-          setIsAdmin(true);
-        } else {
-          window.location.replace(DOWNLOAD_LINK);
-        }
-        return;
-      }
-
-      // Already authenticated as admin — allow normal browsing.
-      if (localStorage.getItem("bv_admin") === ADMIN_KEY) {
-        setIsAdmin(true);
-        const r = parseHash(window.location.hash);
-        if (r.page !== undefined) setCurrentPage(r.page);
-        if (r.videoId !== undefined) setSelectedVideoId(r.videoId);
-        if (r.category !== undefined) setSelectedCategory(r.category);
-        if (r.query !== undefined) setSearchQuery(r.query);
-        setTokenMode(false);
-        return;
-      }
-
-      // Non-admin: only token links are allowed.
-      if (!h.startsWith("t/")) {
-        window.location.replace(DOWNLOAD_LINK);
+        setIsAdmin(localStorage.getItem("bv_admin") === ADMIN_KEY);
         return;
       }
 
@@ -140,7 +102,6 @@ export default function App() {
       if (r.videoId !== undefined) setSelectedVideoId(r.videoId);
       if (r.category !== undefined) setSelectedCategory(r.category);
       if (r.query !== undefined) setSearchQuery(r.query);
-      if (r.tokenMode !== undefined) setTokenMode(r.tokenMode);
     };
     apply();
     window.addEventListener("hashchange", apply);
@@ -155,9 +116,7 @@ export default function App() {
     const onWatch = currentPage === "watch" && selectedVideoId;
     const v = onWatch ? VIDEOS.find((x) => x.id === selectedVideoId) : null;
     if (v) {
-      const url = v.token
-        ? `${window.location.origin}${window.location.pathname}#/t/${v.token}`
-        : `${window.location.origin}${window.location.pathname}#/watch/${slugify(v.title)}`;
+      const url = `${window.location.origin}${window.location.pathname}#/watch/${slugify(v.title)}`;
       document.title = `${v.title} | BangVault`;
       setMeta('meta[name="description"]', v.description);
       setMeta('meta[property="og:title"]', v.title);
@@ -181,11 +140,11 @@ export default function App() {
   }, [currentPage, selectedVideoId]);
 
   useEffect(() => {
-    const desired = buildHash({ page: currentPage, videoId: selectedVideoId, category: selectedCategory, query: searchQuery, tokenMode });
+    const desired = buildHash({ page: currentPage, videoId: selectedVideoId, category: selectedCategory, query: searchQuery });
     if (window.location.hash !== desired && !(desired === "#/" && window.location.hash === "")) {
       window.history.replaceState(null, "", desired);
     }
-  }, [currentPage, selectedVideoId, selectedCategory, searchQuery, tokenMode]);
+  }, [currentPage, selectedVideoId, selectedCategory, searchQuery]);
 
   const addToHistory = (id: string) => {
     setHistory(prev => {
@@ -252,9 +211,7 @@ export default function App() {
 
   const handleShare = useCallback(async () => {
     if (!currentVideo) return;
-    const url = currentVideo.token
-      ? `${window.location.origin}${window.location.pathname}#/t/${currentVideo.token}`
-      : `${window.location.origin}${window.location.pathname}#/watch/${slugify(currentVideo.title)}`;
+    const url = `${window.location.origin}${window.location.pathname}#/watch/${slugify(currentVideo.title)}`;
     try {
       if (navigator.share) { await navigator.share({ title: currentVideo.title, url }); }
       else { await navigator.clipboard.writeText(url); }
@@ -265,16 +222,10 @@ export default function App() {
     }
   }, [currentVideo]);
 
-  const handleCopyTokenLink = useCallback(async (v: Video) => {
-    if (!v.token) return;
-    const url = `${window.location.origin}${window.location.pathname}#/t/${v.token}`;
-    try { await navigator.clipboard.writeText(url); setTokenLinkCopied(true); setTimeout(() => setTokenLinkCopied(false), 2000); } catch { /* noop */ }
-  }, []);
-
   const handleAdminLogout = () => {
     localStorage.removeItem("bv_admin");
     setIsAdmin(false);
-    window.location.replace(DOWNLOAD_LINK);
+    window.location.hash = "#/";
   };
 
   // ─── Admin panel view ────────────────────────────────────────────────────────
@@ -282,72 +233,7 @@ export default function App() {
     return <AdminPanel videos={VIDEOS} onLogout={handleAdminLogout} />;
   }
 
-  // ─── Token-mode (locked) view ────────────────────────────────────────────────
-  if (tokenMode) {
-    if (!currentVideo) {
-      return (
-        <div className="min-h-screen flex flex-col items-center justify-center gap-6 bg-black text-white px-4">
-          <div className="w-20 h-20 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center">
-            <ShieldOff size={36} className="text-zinc-500" />
-          </div>
-          <div className="text-center space-y-2">
-            <h1 className="text-2xl font-bold">Access Denied</h1>
-            <p className="text-zinc-500 text-sm max-w-sm">This link is invalid or has been revoked. Please request a new share link.</p>
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <div className="min-h-screen flex flex-col bg-black text-white selection:bg-brand-primary selection:text-white">
-        {/* Minimal header — logo only, no navigation */}
-        <header className="sticky top-0 z-50 w-full bg-black/80 backdrop-blur-xl border-b border-zinc-900 px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-brand-primary flex items-center justify-center text-white">
-              <Upload size={15} strokeWidth={3} className="-rotate-12" />
-            </div>
-            <span className="text-xl font-bold tracking-tighter">Bang<span className="text-brand-primary">Vault</span></span>
-          </div>
-          <span className="flex items-center gap-1.5 text-[11px] text-zinc-500 font-semibold uppercase tracking-widest">
-            <Lock size={12} /> Restricted Access
-          </span>
-        </header>
-
-        <main className="flex-1 max-w-4xl mx-auto w-full px-4 sm:px-8 py-8 space-y-6">
-          <VideoPlayer src={currentVideo.videoUrl} poster={currentVideo.thumbnailUrl} />
-
-          <a href={DOWNLOAD_LINK} target="_blank" rel="noopener noreferrer"
-            className="flex items-center justify-center gap-3 w-full px-8 py-4 bg-brand-primary hover:bg-brand-primary/90 text-white rounded-xl font-bold uppercase tracking-widest text-sm transition-all hover:scale-[1.01] active:scale-[0.99] shadow-xl shadow-brand-primary/20">
-            <Download size={20} /> Download Now
-          </a>
-
-          <a href={TELEGRAM_LINK} target="_blank" rel="noopener noreferrer"
-            className="flex items-center justify-center gap-3 w-full px-8 py-4 bg-[#229ED9] hover:bg-[#1f8ec3] text-white rounded-xl font-bold uppercase tracking-widest text-sm transition-all hover:scale-[1.01] active:scale-[0.99] shadow-xl shadow-[#229ED9]/20">
-            <Send size={20} /> Join Telegram
-          </a>
-
-          <AdsterraBanner />
-
-          <div className="space-y-3 pt-2">
-            <div className="flex flex-wrap gap-2">
-              {currentVideo.tags?.map(tag => (
-                <span key={tag} className="text-brand-primary text-xs font-bold uppercase tracking-wider">#{tag}</span>
-              ))}
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight leading-snug">{currentVideo.title}</h1>
-            <div className="flex items-center gap-4 text-sm text-zinc-500 font-medium">
-              <span>{(currentVideo.views / 1000).toFixed(1)}K views</span>
-              <span>{currentVideo.duration}</span>
-              <span>{currentVideo.uploadDate}</span>
-            </div>
-            <p className="text-zinc-400 text-sm leading-relaxed">{currentVideo.description}</p>
-          </div>
-        </main>
-      </div>
-    );
-  }
-
-  // ─── Normal (owner) view ─────────────────────────────────────────────────────
+  // ─── Normal public view ─────────────────────────────────────────────────────
   return (
     <div className="min-h-screen flex flex-col selection:bg-brand-primary selection:text-white">
       <Header
@@ -475,22 +361,13 @@ export default function App() {
                             <button className="flex items-center gap-2 px-4 py-2 hover:bg-zinc-800 transition-colors"><ThumbsDown size={18} /></button>
                           </div>
 
-                          {/* Share (copies token link) */}
+                          {/* Share the public watch URL */}
                           <button type="button" onClick={handleShare}
                             className="flex items-center gap-2 px-5 py-2 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 rounded-full transition-all">
                             {shareCopied ? <Check size={18} className="text-brand-primary" /> : <Share2 size={18} />}
                             <span className="text-xs font-bold hidden sm:block">{shareCopied ? "Copied" : "Share"}</span>
                           </button>
 
-                          {/* Copy restricted link (owner tool) */}
-                          {currentVideo.token && (
-                            <button type="button" onClick={() => handleCopyTokenLink(currentVideo)}
-                              title="Copy restricted share link"
-                              className="flex items-center gap-2 px-5 py-2 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 rounded-full transition-all">
-                              {tokenLinkCopied ? <Check size={18} className="text-brand-primary" /> : <Lock size={18} />}
-                              <span className="text-xs font-bold hidden sm:block">{tokenLinkCopied ? "Copied" : "Share Link"}</span>
-                            </button>
-                          )}
                         </div>
                       </div>
 

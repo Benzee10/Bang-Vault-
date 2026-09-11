@@ -12,6 +12,5 @@ export const video: Video = {
   duration: "19:27",
   uploadDate: "2026-05-19",
   isTrending: false,
-  isFeatured: false,
-  token: "py9wc3mx6n"
+  isFeatured: false
 };

@@ -37,6 +37,3 @@ export const findVideoBySlug = (slug: string): Video | undefined =>
 
 export const findVideoById = (id: string): Video | undefined =>
   VIDEOS.find((v) => v.id === id);
-
-export const findVideoByToken = (token: string): Video | undefined =>
-  VIDEOS.find((v) => v.token === token);
