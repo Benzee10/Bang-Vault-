@@ -11,5 +11,6 @@ import { video as sexyCaramelSlimmie } from "./sexy-caramel-slimmie-plays-rides"
 import { video as sexyPetiteChocolateSlimmie } from "./sexy-petite-chocolate-slimmie-squirts";
 import { video as backyardSex } from "./backyard-sex";
 import { video as exoticEbonyEnchantress } from "./exotic-ebony-enchantress";
+import { video as diggingMyFriendsBothHoles } from "./digging-my-friends-both-holes";
 
-export const allVideos = [exoticEbonyEnchantress, backyardSex, sexyPetiteChocolateSlimmie, sexyCaramelSlimmie, musicianPussyPlay, imagineYoureHere, pretiiPaiidGiq, v9, v8, v7, v5, v4, v3];
+export const allVideos = [diggingMyFriendsBothHoles, exoticEbonyEnchantress, backyardSex, sexyPetiteChocolateSlimmie, sexyCaramelSlimmie, musicianPussyPlay, imagineYoureHere, pretiiPaiidGiq, v9, v8, v7, v5, v4, v3];
